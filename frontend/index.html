@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>ChatApp</title>
+    <meta charset="utf-8">
+    <meta viewport="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="./main.css">
+    <script defer type="module" src="./index.js"></script>
+</head>
+
+<body>
+    <div class="container center">
+        <h1 class="text-center">ChatApp</h1>
+        <div class="chatbox">
+            <div class="question-container center">
+                <form class="flex-col" onsubmit="send(event)">
+                    <label for="question-box">Enter your question:</label>
+                    <textarea id="question-box" name="question" rows="4"></textarea>
+                    <button id="send-button" type="submit">Send</button>
+                    <p id="error-field" class="hidden"></p>
+                </form>
+            </div>
+            <div id="answer-div" class="answer-container center">
+                <p>Answer by AI:</p>
+                <p id="answer-field"></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
