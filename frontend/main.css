@@ -19,6 +19,7 @@ body {
 
 .container {
     padding: 10px;
+    padding-bottom: 25px;
     background-color: #f8deff;
     border-radius: 10px;
     max-width: 720px;
@@ -36,6 +37,10 @@ body {
     text-align: center;
 }
 
+.bold{
+    font-weight: bold;
+} 
+
 .question-container, .answer-container {
     display: flex;
     flex-direction: column;
@@ -52,7 +57,7 @@ body {
 
 #question-box {
     margin-bottom: 5px;;
-    padding: 3px;
+    padding: 3px 5px;
     border-radius: 5px;
 }
 
@@ -70,8 +75,11 @@ button:hover {
     background-color: #f3c6ff;
 }
 
-#answer-field {
+#answer-div {
+    padding: 3px 5px;
     background-color: #ffffff;
+    border-radius: 5px;
+    border: 1px solid black;
 }
 
 #error-field {
