@@ -10,6 +10,8 @@ if (answerElement.innerText.length === 0 && !answerDiv.classList.contains("hidde
 const send = async (event) => {
     event.preventDefault();
 
+    if (answerElement.innerText.length !== 0) answerElement.innerText += '\n\n'
+
     const questionText = document.getElementById("question-box").value;
     if (local) console.log("QUESTION:", questionText);
 
@@ -28,19 +30,31 @@ const send = async (event) => {
             console.log(response);
             throw new Error("Failed to get an answer from AI.");
         }
-        const data = await response.json();
+        
+        //const data = await response.json();
+
         if (!errorElement.classList.contains("hidden")) errorElement.classList.add("hidden");
         if (answerDiv.classList.contains("hidden")) answerDiv.classList.remove("hidden");
-        answerElement.innerText = data.text;
-        answererElement.innerText = data.from + ":";
-        if (answerDiv.classList.contains("hidden")) answerDiv.classList.remove("hidden");
+        answererElement.innerText = "AI Assistant:";
+
+        // Stream reader
+        const reader = response.body.getReader();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const message = new TextDecoder().decode(value);
+            console.log('Received:', message);
+            answerElement.innerText += JSON.parse(message)["response"];
+        }
+
 
     } catch (error) {
         if (local) console.log("Error getting answer from AI:", error);
         errorElement.innerText = "Failed to get an answer from AI.";
         if (errorElement.classList.contains("hidden")) {
             errorElement.classList.remove("hidden");
-            answerDiv.classList.add("hidden");
+            //answerDiv.classList.add("hidden");
         }
     }
 };

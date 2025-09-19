@@ -17,18 +17,19 @@
     <div class="container center">
         <h1 class="text-center">ChatApp</h1>
         <div class="chatbox">
-            <div class="question-container center">
-                <form class="flex-col" onsubmit="send(event)">
-                    <label for="question-box">Enter your question:</label>
-                    <textarea id="question-box" name="question" rows="4"></textarea>
-                    <button id="send-button" type="submit">Send</button>
-                    <p id="error-field" class="hidden"></p>
-                </form>
-            </div>
             <div id="answer-div" class="answer-container center">
                 <span id="answerer" class="bold"></span>
                 <p id="answer-field"></p>
             </div>
+
+            <div class="question-container center">
+                <form class="flex-col" onsubmit="send(event)">
+                    <label for="question-box">Enter your question:</label>
+                    <textarea id="question-box" name="question" rows="4" required></textarea>
+                    <button id="send-button" type="submit">Send</button>
+                    <p id="error-field" class="hidden"></p>
+                </form>
+            </div> 
         </div>
     </div>
 </body>

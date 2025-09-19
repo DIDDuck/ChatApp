@@ -19,7 +19,7 @@ body {
 
 .container {
     padding: 10px;
-    padding-bottom: 25px;
+    padding-bottom: 35px;
     background-color: #f8deff;
     border-radius: 10px;
     max-width: 720px;
@@ -42,12 +42,13 @@ body {
 } 
 
 .question-container, .answer-container {
+    margin-top: 15px;
     display: flex;
     flex-direction: column;
     max-width: 640px;   
 }
 .answer-container {
-    margin-top: 25px;
+    margin-bottom: 25px;
 }
 
 .flex-col {
@@ -56,7 +57,7 @@ body {
 }
 
 #question-box {
-    margin-bottom: 5px;;
+    margin-bottom: 5px;
     padding: 3px 5px;
     border-radius: 5px;
 }
