@@ -38,9 +38,11 @@ def answer():
                     #print(f"PART_{i}:", part_response.json()["response"])
                     i += 1
                     decoded_part = part_response.decode("utf-8")
-                    print(f"PART_{i}:", json.loads(decoded_part))
+                    print(f"PART_{i}_UNdecoded:", part_response)
+                    print(f"PART_{i}_DECODED:", json.loads(decoded_part))
 
-                    yield json.dumps(json.loads(decoded_part))# + "\n"
+                    #yield json.dumps(json.loads(decoded_part))# + "\n"
+                    yield decoded_part
 
         headers = {
                 "Access-Control-Allow-Headers": "Content-Type,Access-Control-Allow-Origin",

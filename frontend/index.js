@@ -40,14 +40,35 @@ const send = async (event) => {
         // Stream reader
         const reader = response.body.getReader();
 
+        let index = 0;
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
             const message = new TextDecoder().decode(value);
-            console.log('Received:', message);
-            answerElement.innerText += JSON.parse(message)["response"];
-        }
+            console.log(`Received ${index}:`, message);
 
+            // At some point the message (JSON string) seems to include at least two JSON objects -> JSON.parse raises error. As a quick fix let's split these messages.
+            console.log("TRUE OR FALSE:" ,message.includes("false}{"))
+            if (message.includes("false}{")) {
+                const messages = message.split("false}{"); // could be 2 or more messages
+                let currentMessage;
+                for (let i = 0; i ++; i < messages.length){ // first
+                    if (i === 0){
+                        currentMessage = messages[i] + "false}";
+                    }
+                    else if (i === messages.length - 1){    // last
+                        currentMessage = "{" + messages[i];
+                        
+                    } else{ // the rest of parts
+                        currentMessage = "{" + messages[i] + "false}";
+                    } 
+                    answerElement.innerText += JSON.parse(currentMessage)["response"];
+                } 
+                if (local) console.log(`SPLIT ERROR MESSAGE: ${index}`)
+            }
+            else answerElement.innerText += JSON.parse(message)["response"];
+            index ++;
+        }
 
     } catch (error) {
         if (local) console.log("Error getting answer from AI:", error);
