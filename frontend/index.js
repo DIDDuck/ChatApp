@@ -7,13 +7,18 @@ const answerDiv = document.getElementById("answer-div");
 if (answerElement.innerText.length === 0 && !answerDiv.classList.contains("hidden")) {
     answerDiv.classList.add("hidden");
 }
+
 const send = async (event) => {
     event.preventDefault();
 
     if (answerElement.innerText.length !== 0) answerElement.innerText += '\n\n'
 
     const questionText = document.getElementById("question-box").value;
+    const streamCheckbox = document.getElementById("stream-checkbox");
     if (local) console.log("QUESTION:", questionText);
+
+    const stream = streamCheckbox.checked ? true : false;
+    console.log("STREAM:", stream);
 
     // Send question to backend and wait for answer
     try {
@@ -23,59 +28,66 @@ const send = async (event) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                question: questionText
+                question: questionText,
+                stream: stream
             })
         })
         if (!response.ok) {
             console.log(response);
             throw new Error("Failed to get an answer from AI.");
         }
-        
-        //const data = await response.json();
 
         if (!errorElement.classList.contains("hidden")) errorElement.classList.add("hidden");
         if (answerDiv.classList.contains("hidden")) answerDiv.classList.remove("hidden");
         answererElement.innerText = "AI Assistant:";
-
+        //answerElement.innerText += answerElement.innerText.length === 0 ? "AI Assistant:\n" : "\n\nAI Assistant:\n";
+        
         // Stream reader
-        const reader = response.body.getReader();
+        if (stream) {
+            const reader = response.body.getReader();
 
-        let index = 0;
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            const message = new TextDecoder().decode(value);
-            console.log(`Received ${index}:`, message);
+            let index = 0;
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const message = new TextDecoder().decode(value);
+                console.log(`Received ${index}:`, message);
 
-            // At some point the message (JSON string) seems to include at least two JSON objects -> JSON.parse raises error. As a quick fix let's split these messages.
-            console.log("TRUE OR FALSE:" ,message.includes("false}{"))
-            if (message.includes("false}{")) {
-                const messages = message.split("false}{"); // could be 2 or more messages
-                let currentMessage;
-                for (let i = 0; i ++; i < messages.length){ // first
-                    if (i === 0){
-                        currentMessage = messages[i] + "false}";
+                // At some point the message (JSON string) seems to include at least two JSON objects -> JSON.parse raises error. As a quick fix let's split these messages.
+                console.log("TRUE OR FALSE:", message.includes("false}{"))
+                if (message.includes("false}{")) {
+                    const messages = message.split("false}{"); // could be 2 or more messages
+                    let currentMessage;
+                    for (let i = 0; i++; i < messages.length) { // first
+                        if (i === 0) {
+                            currentMessage = messages[i] + "false}";
+                        }
+                        else if (i === messages.length - 1) {    // last
+                            currentMessage = "{" + messages[i];
+
+                        } else { // the rest of parts
+                            currentMessage = "{" + messages[i] + "false}";
+                        }
+                        answerElement.innerText += JSON.parse(currentMessage)["response"];
                     }
-                    else if (i === messages.length - 1){    // last
-                        currentMessage = "{" + messages[i];
-                        
-                    } else{ // the rest of parts
-                        currentMessage = "{" + messages[i] + "false}";
-                    } 
-                    answerElement.innerText += JSON.parse(currentMessage)["response"];
-                } 
-                if (local) console.log(`SPLIT ERROR MESSAGE: ${index}`)
+                    if (local) console.log(`SPLIT ERROR MESSAGE: ${index}`)
+                }
+                else answerElement.innerText += JSON.parse(message)["response"];
+                index++;
             }
-            else answerElement.innerText += JSON.parse(message)["response"];
-            index ++;
-        }
+        // Read response in one piece
+        } else {
+            const data = await response.json();
+            console.log("DATA: ", data);
+            answerElement.innerText += data.text;
+            console.log("TYPE OF DATA:",typeof data)
+        } 
 
     } catch (error) {
         if (local) console.log("Error getting answer from AI:", error);
         errorElement.innerText = "Failed to get an answer from AI.";
         if (errorElement.classList.contains("hidden")) {
             errorElement.classList.remove("hidden");
-            //answerDiv.classList.add("hidden");
         }
     }
 };

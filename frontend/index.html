@@ -26,10 +26,14 @@
                 <form class="flex-col" onsubmit="send(event)">
                     <label for="question-box">Enter your question:</label>
                     <textarea id="question-box" name="question" rows="4" required></textarea>
+                    <div class="flex">
+                        <label for="stream-checkbox">Streaming response</label>
+                        <input id="stream-checkbox" type="checkbox" name="stream" class="checkbox" checked >
+                    </div>
                     <button id="send-button" type="submit">Send</button>
                     <p id="error-field" class="hidden"></p>
                 </form>
-            </div> 
+            </div>
         </div>
     </div>
 </body>

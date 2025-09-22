@@ -5,22 +5,27 @@ import requests
 app = Flask(__name__)
 
 
-@app.route("/", methods = ["GET", "POST", "OPTIONS"])
+@app.route("/api/chat", methods = ["GET", "POST", "OPTIONS"])
 def answer():
 
     user_prompt = ""
+    stream = config.stream # default value, gets overwritten with frontend form value
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
         user_prompt = request.json["question"]
+        stream = request.json["stream"]
+        print("REQUEST:", request.json)
+    
 
     print("USER_PROMPT:", user_prompt)
+    print("STREAM:", stream)
 
     # We wait for the response to be complete
-    if config.stream == False:
+    if stream == False:
         api_response = requests.post(os.getenv("LLM_URL"), json = {
             "model": config.model,
             "prompt": user_prompt,
-            "stream": config.stream
+            "stream": False
         })
 
     # We get a streaming response piece by piece
@@ -29,7 +34,7 @@ def answer():
             api_response = requests.post(os.getenv("LLM_URL"), json = {
                 "model": config.model,
                 "prompt": user_prompt,
-                "stream": config.stream
+                "stream": True
             }, stream = True)
 
             i = 0
@@ -51,17 +56,10 @@ def answer():
         return Response(stream_with_context(generate_stream()), content_type = "text/plain", headers = headers)
 
 
-    """
     res = jsonify({
         "from": "AI Assistant",
         "text": api_response.json()["response"]
-        })
-    """
-
-    res = jsonify({
-        "from": "AI Assistant",
-        "text": "Placeholder response..."
-        })    
+        }) 
     res.headers.add("Access-Control-Allow-Headers", "Content-Type,Access-Control-Allow-Origin")
     res.headers.add("Content-Type", "application/json")
     res.headers.add("Access-Control-Allow-Origin", config.allowed_origin)
