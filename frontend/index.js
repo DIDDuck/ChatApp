@@ -1,24 +1,26 @@
 import { local, backendUrl } from "./configuration.js";
 
-const answerElement = document.getElementById("answer-field");
-const answererElement = document.getElementById("answerer");
 const errorElement = document.getElementById("error-field");
-const answerDiv = document.getElementById("answer-div");
-if (answerElement.innerText.length === 0 && !answerDiv.classList.contains("hidden")) {
-    answerDiv.classList.add("hidden");
+const messagesDiv = document.getElementById("messages-div");
+
+if (messagesDiv.querySelectorAll("div").length === 0 && !messagesDiv.classList.contains("hidden")) {
+    messagesDiv.classList.add("hidden");
 }
 
 const send = async (event) => {
     event.preventDefault();
 
-    if (answerElement.innerText.length !== 0) answerElement.innerText += '\n\n'
-
+    // Get form values
     const questionText = document.getElementById("question-box").value;
     const streamCheckbox = document.getElementById("stream-checkbox");
     if (local) console.log("QUESTION:", questionText);
 
+    // Insert user message to conversation box
+    messagesDiv.appendChild(createMessageDiv("User:", questionText, messagesDiv));
+    messagesDiv.classList.remove("hidden");
+
+    // Do we want AI Assistant message streamed or in one piece
     const stream = streamCheckbox.checked ? true : false;
-    console.log("STREAM:", stream);
 
     // Send question to backend and wait for answer
     try {
@@ -38,12 +40,12 @@ const send = async (event) => {
         }
 
         if (!errorElement.classList.contains("hidden")) errorElement.classList.add("hidden");
-        if (answerDiv.classList.contains("hidden")) answerDiv.classList.remove("hidden");
-        answererElement.innerText = "AI Assistant:";
-        //answerElement.innerText += answerElement.innerText.length === 0 ? "AI Assistant:\n" : "\n\nAI Assistant:\n";
         
         // Stream reader
         if (stream) {
+            const newMessageDiv = createMessageDiv("AI Assistant:", "", messagesDiv);
+            messagesDiv.appendChild(newMessageDiv);
+
             const reader = response.body.getReader();
 
             let index = 0;
@@ -51,7 +53,7 @@ const send = async (event) => {
                 const { done, value } = await reader.read();
                 if (done) break;
                 const message = new TextDecoder().decode(value);
-                console.log(`Received ${index}:`, message);
+                if (local) console.log(`Received ${index}:`, message);
 
                 // At some point the message (JSON string) seems to include at least two JSON objects -> JSON.parse raises error. As a quick fix let's split these messages.
                 console.log("TRUE OR FALSE:", message.includes("false}{"))
@@ -68,19 +70,18 @@ const send = async (event) => {
                         } else { // the rest of parts
                             currentMessage = "{" + messages[i] + "false}";
                         }
-                        answerElement.innerText += JSON.parse(currentMessage)["response"];
+                        newMessageDiv.querySelectorAll("p")[1].innerText += JSON.parse(currentMessage)["response"];
                     }
                     if (local) console.log(`SPLIT ERROR MESSAGE: ${index}`)
                 }
-                else answerElement.innerText += JSON.parse(message)["response"];
+                else newMessageDiv.querySelectorAll("p")[1].innerText += JSON.parse(message)["response"];
                 index++;
             }
         // Read response in one piece
         } else {
             const data = await response.json();
-            console.log("DATA: ", data);
-            answerElement.innerText += data.text;
-            console.log("TYPE OF DATA:",typeof data)
+            if (local) console.log("DATA: ", data);
+            messagesDiv.appendChild(createMessageDiv("AI Assistant:", data.text, messagesDiv));
         } 
 
     } catch (error) {
@@ -91,4 +92,25 @@ const send = async (event) => {
         }
     }
 };
+
+const createMessageDiv = (role, text, parent ) => {
+    const messageDiv = document.createElement("div");
+    
+    // If already some messages in parent, add margin
+    if (parent.querySelectorAll("div").length !== 0){
+        messageDiv.classList.add("mt-10");
+    }
+    
+    const messageRole = document.createElement("p");
+    messageRole.classList.add("bold");
+    messageRole.innerText = role;
+    const messageText = document.createElement("p");
+    messageText.classList.add("mx-10")
+    messageText.innerText = text;
+    messageDiv.appendChild(messageRole);
+    messageDiv.appendChild(messageText);
+
+    return messageDiv;
+} 
+
 window.send = send;

@@ -93,13 +93,20 @@ button:hover {
     background-color: #dae6ff;
 }
 
-#answer-div {
+#messages-div {
     padding: 3px 5px;
     background-color: #ffffff;
     border-radius: 5px;
     border: 1px solid black;
     font-size: 14px;
 }
+
+.mt-10 {
+    margin-top: 10px;
+}
+.mx-10 {
+    margin: 0 10px;
+} 
 
 #error-field {
     margin-top: 10px;

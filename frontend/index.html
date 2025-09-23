@@ -17,14 +17,14 @@
     <div class="container center">
         <h1 class="text-center">ChatApp</h1>
         <div class="chatbox">
-            <div id="answer-div" class="answer-container center">
-                <span id="answerer" class="bold"></span>
-                <p id="answer-field"></p>
+            <div id="messages-div" class="answer-container center">
+                <!--<span id="answerer" class="bold"></span>
+                <p id="answer-field"></p>-->
             </div>
 
             <div class="question-container center">
                 <form class="flex-col" onsubmit="send(event)">
-                    <label for="question-box">Enter your question:</label>
+                    <label for="question-box">Enter your message:</label>
                     <textarea id="question-box" name="question" rows="4" required></textarea>
                     <div class="flex">
                         <label for="stream-checkbox">Streaming response</label>
