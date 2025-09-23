@@ -12,7 +12,7 @@ def answer():
     stream = config.stream # default value, gets overwritten with frontend form value
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
-        user_prompt = request.json["question"]
+        user_prompt = request.json["message"]
         stream = request.json["stream"]
         print("REQUEST:", request.json)
     

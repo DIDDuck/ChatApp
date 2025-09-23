@@ -11,13 +11,14 @@ const send = async (event) => {
     event.preventDefault();
 
     // Get form values
-    const questionText = document.getElementById("question-box").value;
+    const userMessageText = document.getElementById("user-message-box").value;
     const streamCheckbox = document.getElementById("stream-checkbox");
-    if (local) console.log("QUESTION:", questionText);
+    if (local) console.log("QUESTION:", userMessageText);
 
     // Insert user message to conversation box
-    messagesDiv.appendChild(createMessageDiv("User:", questionText, messagesDiv));
+    messagesDiv.appendChild(createMessageDiv("User:", userMessageText, messagesDiv));
     messagesDiv.classList.remove("hidden");
+    document.getElementById("user-message-box").value = "";
 
     // Do we want AI Assistant message streamed or in one piece
     const stream = streamCheckbox.checked ? true : false;
@@ -30,7 +31,7 @@ const send = async (event) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                question: questionText,
+                message: userMessageText,
                 stream: stream
             })
         })
