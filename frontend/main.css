@@ -41,13 +41,13 @@ body {
     font-weight: bold;
 } 
 
-.question-container, .answer-container {
+.user-message-container, .messages-container {
     margin-top: 15px;
     display: flex;
     flex-direction: column;
     max-width: 640px;   
 }
-.answer-container {
+.messages-container {
     margin-bottom: 25px;
 }
 
