@@ -112,6 +112,14 @@ const createMessageDiv = (role, text, parent ) => {
     messageDiv.appendChild(messageText);
 
     return messageDiv;
-} 
+};
+
+const darkMode = () => {
+    document.body.classList.toggle("dark");
+    document.getElementById("user-message-box").classList.toggle("dark");
+    document.getElementById("messages-div").classList.toggle("dark");
+    document.getElementsByClassName("container")[0].classList.toggle("dark");
+};
 
 window.send = send;
+window.darkMode = darkMode;

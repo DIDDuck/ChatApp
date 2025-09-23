@@ -10,12 +10,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="./main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
     <script defer type="module" src="./index.js"></script>
 </head>
 
 <body>
-    <div class="container center">
+    <div class="container center relative">
         <h1 class="text-center">ChatApp</h1>
+        <div class="absolute-top-right">
+            <i class="fa-regular fa-moon" onclick="darkMode()"></i>
+        </div>
         <div class="chatbox">
             <div id="messages-div" class="messages-container center">
             </div>
