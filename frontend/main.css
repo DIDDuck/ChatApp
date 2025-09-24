@@ -1,5 +1,7 @@
 :root {
-    --textbox-bg-color: #2b2b2b;
+    --messages-bg-color-dark: #2b2b2b;
+    --page-container-max-width: 960px;
+    --text-box-max-width: 880px;
 }
 
 * {
@@ -16,7 +18,9 @@
 body {
     background-color: #ffffff;
     height: 100vh;
+    max-height: 100vh;
     padding: 15px;
+    overflow-x: auto;
 }
 
 .container {
@@ -25,10 +29,16 @@ body {
     background-color: #f8deff;
     color: black;
     border-radius: 10px;
-    max-width: 720px;
+    max-width: var(--page-container-max-width);
+    max-height: calc(100vh - 30px);
+    overflow-x: auto;
 }
 .container.dark {
     background-color: #251e2b;
+}
+
+.chatbox {
+    max-height: 100%;
 }
 
 .center {
@@ -43,7 +53,7 @@ body {
     text-align: center;
 }
 
-.bold{
+.bold {
     font-weight: bold;
 }
 
@@ -53,9 +63,6 @@ body {
 
 .absolute-top-right {
     position: absolute;
-    /*width: 50px;
-    height: 25px;
-    background-color: beige;*/
     top: 20px;
     right: 20px;
 }
@@ -64,7 +71,7 @@ body {
     margin-top: 15px;
     display: flex;
     flex-direction: column;
-    max-width: 640px;   
+    max-width: var(--text-box-max-width);   
 }
 .messages-container {
     margin-bottom: 25px;
@@ -97,7 +104,7 @@ body {
     font-size: 14px;
 }
 #user-message-box.dark {
-    background-color: var(--textbox-bg-color);
+    background-color: var(--messages-bg-color-dark);
     border: 1px solid black;
 } 
 
@@ -117,21 +124,55 @@ button:hover {
 }
 
 #messages-div {
-    padding: 3px 5px;
+    padding: 15px 15px;
     background-color: #ffffff;
     border-radius: 5px;
     border: 1px solid black;
     font-size: 14px;
 }
 #messages-div.dark {
-    background-color: var(--textbox-bg-color);
+    background-color: var(--messages-bg-color-dark);
+}
+#messages-div>div {
+    padding: 10px;
+    background-color: #fcf3ff;
+    border-radius: 10px;
+}
+#messages-div>div.dark {
+    background-color: #222222;
+}
+#messages-div ul>li, #messages-div ol>li {
+    margin-left: 20px;
+}
+#messages-div>div>p {
+    font-size: 16px;
+}
+#messages-div pre:has(code) {
+    padding: 5px;
+    background-color: #e7e7e7;
+    border-radius: 5px;
+}
+#messages-div pre:has(code.dark) {
+    padding: 5px;
+    background-color: #080808;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+#messages-div pre>code.dark {
+    background-color: #080808;
 }
 
-.mt-10 {
-    margin-top: 10px;
+.mt-20 {
+    margin-top: 20px;
 }
 .mx-10 {
     margin: 0 10px;
+}
+.mb-10 {
+    margin-bottom: 10px;
+}
+.pre {
+    white-space-collapse: preserve;
 } 
 
 #error-field {
