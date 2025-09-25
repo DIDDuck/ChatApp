@@ -11,15 +11,10 @@
     font-family: "Noto Sans Display", Arial, Helvetica, sans-serif;
 }
 
-/*html {
-    height: 100vh;
-}*/
-
 body {
     background-color: #ffffff;
     height: 100vh;
     max-height: 100vh;
-    padding: 15px;
     overflow-x: auto;
 }
 
@@ -28,9 +23,9 @@ body {
     padding-bottom: 35px;
     background-color: #f8deff;
     color: black;
-    border-radius: 10px;
     max-width: var(--page-container-max-width);
-    max-height: calc(100vh - 30px);
+    min-height: 100vh;
+    max-height: 100vh;
     overflow-x: auto;
 }
 .container.dark {

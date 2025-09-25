@@ -11,7 +11,7 @@
         rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="./main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14/dist/markdown-it.min.js"></script>
     <script defer type="module" src="./index.js"></script>
 </head>
 
@@ -31,7 +31,7 @@
                     <textarea id="user-message-box" name="user-message" rows="4" required></textarea>
                     <div class="flex">
                         <label for="stream-checkbox">Streaming response</label>
-                        <input id="stream-checkbox" type="checkbox" name="stream" class="checkbox" checked >
+                        <input id="stream-checkbox" type="checkbox" name="stream" class="checkbox" checked>
                     </div>
                     <button id="send-button" type="submit">Send</button>
                     <p id="error-field" class="hidden"></p>

@@ -1,8 +1,8 @@
-import { local, backendUrl } from "./configuration.js"; 
+import { local, backendUrl } from "./configuration.js";
 
 const errorElement = document.getElementById("error-field");
 const messagesDiv = document.getElementById("messages-div");
-const converter = new showdown.Converter(); // Markdown to html converter
+const md = window.markdownit({ html: false });
 
 if (messagesDiv.querySelectorAll("div").length === 0 && !messagesDiv.classList.contains("hidden")) {
     messagesDiv.classList.add("hidden");
@@ -82,7 +82,7 @@ const send = async (event) => {
             // When text is complete, convert from markdown to html
             const completeText = newMessageDiv.querySelector("div").innerText;
             newMessageDiv.querySelector("div").innerText = "";
-            newMessageDiv.querySelector("div").innerHTML = converter.makeHtml(completeText);
+            newMessageDiv.querySelector("div").innerHTML = md.render(completeText);
             applyColorTheme();
 
         // Read response in one piece
@@ -120,7 +120,7 @@ const createMessageDiv = (role, text, parent ) => {
     messageRole.innerText = role;
     const messageText = document.createElement("div");
     messageText.classList.add("mx-10", "pre")
-    messageText.innerHTML = converter.makeHtml(text);
+    messageText.innerHTML = md.render(text);
     messageDiv.appendChild(messageRole);
     messageDiv.appendChild(messageText);
 
