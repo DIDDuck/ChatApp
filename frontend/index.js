@@ -3,6 +3,7 @@ import { local, backendUrl } from "./configuration.js";
 const errorElement = document.getElementById("error-field");
 const messagesDiv = document.getElementById("messages-div");
 const md = window.markdownit({ html: false });
+const messages = []; // We want to save the whole conversation
 
 if (messagesDiv.querySelectorAll("div").length === 0 && !messagesDiv.classList.contains("hidden")) {
     messagesDiv.classList.add("hidden");
@@ -15,6 +16,10 @@ const send = async (event) => {
     const userMessageText = document.getElementById("user-message-box").value;
     const streamCheckbox = document.getElementById("stream-checkbox");
     if (local) console.log("USER MESSAGE:", userMessageText);
+    messages.push({
+        role: "user",
+        content: userMessageText
+    })
 
     // Insert user message to conversation box
     messagesDiv.appendChild(createMessageDiv("User:", userMessageText, messagesDiv));
@@ -33,7 +38,8 @@ const send = async (event) => {
             },
             body: JSON.stringify({
                 message: userMessageText,
-                stream: stream
+                stream: stream,
+                messages: messages
             })
         })
         if (!response.ok) {
@@ -60,27 +66,33 @@ const send = async (event) => {
                 // At some point the message (JSON string) seems to include at least two JSON objects -> JSON.parse raises error. As a quick fix let's split these messages.
                 console.log("TRUE OR FALSE:", message.includes("false}{"))
                 if (message.includes("false}{")) {
-                    const messages = message.split("false}{"); // could be 2 or more messages
+                    const partMessages = message.split("false}{"); // could be 2 or more partMessages
                     let currentMessage;
-                    for (let i = 0; i++; i < messages.length) { // first
+                    for (let i = 0; i++; i < partMessages.length) { // first
                         if (i === 0) {
-                            currentMessage = messages[i] + "false}";
+                            currentMessage = partMessages[i] + "false}";
                         }
-                        else if (i === messages.length - 1) {    // last
-                            currentMessage = "{" + messages[i];
+                        else if (i === partMessages.length - 1) {    // last
+                            currentMessage = "{" + partMessages[i];
 
                         } else { // the rest of parts
-                            currentMessage = "{" + messages[i] + "false}";
+                            currentMessage = "{" + partMessages[i] + "false}";
                         }
-                        newMessageDiv.querySelector("div").innerText += JSON.parse(currentMessage)["response"];
+                        // Depending on backend actions reply message text may be one of two: ["response"] or ["message"]["content"]
+                        newMessageDiv.querySelector("div").innerText += JSON.parse(currentMessage)["response"] ?? JSON.parse(currentMessage)["message"]["content"];
                     }
                     if (local) console.log(`SPLIT ERROR MESSAGE: ${index}`)
                 }
-                else newMessageDiv.querySelector("div").innerText += JSON.parse(message)["response"];
+                else newMessageDiv.querySelector("div").innerText += JSON.parse(message)["response"] ?? JSON.parse(message)["message"]["content"];
                 index++;
             }
-            // When text is complete, convert from markdown to html
+            // When text is complete, convert from markdown to html, and add complete reply to messages
             const completeText = newMessageDiv.querySelector("div").innerText;
+            messages.push({
+                role: "assistant",
+                content: completeText
+            });
+            if (local) console.log("MESSAGES:", messages);
             newMessageDiv.querySelector("div").innerText = "";
             newMessageDiv.querySelector("div").innerHTML = md.render(completeText);
             applyColorTheme();
@@ -90,6 +102,11 @@ const send = async (event) => {
             const data = await response.json();
             if (local) console.log("DATA: ", data);
             
+            messages.push({
+                role: "assistant",
+                content: data.text
+            });
+            if (local) console.log("MESSAGES:", messages);
             messagesDiv.appendChild(createMessageDiv("AI Assistant:", data.text, messagesDiv));
             applyColorTheme();
         } 
