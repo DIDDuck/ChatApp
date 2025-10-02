@@ -22,39 +22,63 @@ def answer():
     print("USER_PROMPT:", user_prompt)
     print("STREAM:", stream)
 
+    
     # We wait for the response to be complete
     if stream == False and request.method == "POST":
-        if os.getenv("LLM_URL").endswith("generate"):
-            api_response = requests.post(os.getenv("LLM_URL"), json = {
-                "model": config.model,
-                "prompt": user_prompt,
-                "stream": False
-            })
+        try:
+            if os.getenv("LLM_URL").endswith("generate"):
+                api_response = requests.post(os.getenv("LLM_URL"), json = {
+                    "model": config.model,
+                    "prompt": user_prompt,
+                    "stream": False
+                })
 
-        if os.getenv("LLM_URL").endswith("chat"):
-            api_response = requests.post(os.getenv("LLM_URL"), json = {
-                "model": config.model,
-                "messages": messages,
-                "stream": False
+            if os.getenv("LLM_URL").endswith("chat"):
+                api_response = requests.post(os.getenv("LLM_URL"), json = {
+                    "model": config.model,
+                    "messages": messages,
+                    "stream": False
+                })
+        except:
+            print("Something failed")
+            res = jsonify({
+                "error": True,
+                "message": "API response failed."
             })
+            res.headers.add("Access-Control-Allow-Headers", "Content-Type,Access-Control-Allow-Origin")
+            res.headers.add("Content-Type", "application/json")
+            res.headers.add("Access-Control-Allow-Origin", config.allowed_origin)
+
+            return res
+
 
     # We get a streaming response piece by piece
     else:
         if request.method == "POST":
             def generate_stream():
-                if os.getenv("LLM_URL").endswith("generate"):
-                    api_response = requests.post(os.getenv("LLM_URL"), json = {
-                        "model": config.model,
-                        "prompt": user_prompt, # Only the latest user message is sent to Ollama /api/generate
-                        "stream": True
-                    }, stream = True)
+                try:
+                    if os.getenv("LLM_URL").endswith("generate"):
+                        api_response = requests.post(os.getenv("LLM_URL"), json = {
+                            "model": config.model,
+                            "prompt": user_prompt, # Only the latest user message is sent to Ollama /api/generate
+                            "stream": True
+                        }, stream = True)
 
-                if os.getenv("LLM_URL").endswith("chat"):
-                    api_response = requests.post(os.getenv("LLM_URL"), json = {
-                        "model": config.model,
-                        "messages": messages, # All conversation messages are sent to Ollama /api/chat
-                        "stream": True
-                    }, stream = True)
+                    if os.getenv("LLM_URL").endswith("chat"):
+                        api_response = requests.post(os.getenv("LLM_URL"), json = {
+                            "model": config.model,
+                            "messages": messages, # All conversation messages are sent to Ollama /api/chat
+                            "stream": True
+                        }, stream = True)
+                except:
+                    # For example, if Ollama api is not running, we end up here.
+                    print("Something failed")
+                    res_dict = {
+                        "error": True,
+                        "message": "Failed to get an answer from AI."
+                    }
+                    yield json.dumps(res_dict)
+                    return 
 
                 i = 0
                 for part_response in api_response.iter_lines():
@@ -70,20 +94,32 @@ def answer():
                     "Access-Control-Allow-Origin": config.allowed_origin
                 } 
             return Response(stream_with_context(generate_stream()), content_type = "text/plain", headers = headers)
-
+        
     if request.method == "OPTIONS": res = jsonify({}) # dummy payload for OPTIONS message reply
 
-    if os.getenv("LLM_URL").endswith("generate") and request.method == "POST":
-        res = jsonify({
-        "from": "AI Assistant",
-        "text": api_response.json()["response"] # Response from Ollama /api/generate
-        })
+    if os.getenv("LLM_URL").endswith("generate") and request.method == "POST": # Response from Ollama /api/generate
+        if "error" in api_response.json():
+            res = jsonify({
+                "error": True,
+                "message": "Failed to get an answer from AI." 
+            })    
+        else:
+            res = jsonify({
+                "from": "AI Assistant",
+                "text": api_response.json()["response"] 
+            })
 
-    if os.getenv("LLM_URL").endswith("chat") and request.method == "POST":
-        res = jsonify({
-            "from": "AI Assistant",
-            "text": api_response.json()["message"]["content"] # Response from Ollama /api/chat
-            }) 
+    if os.getenv("LLM_URL").endswith("chat") and request.method == "POST": # Response from Ollama /api/chat
+        if "error" in api_response.json():
+            res = jsonify({
+                "error": True,
+                "message": "Failed to get an answer from AI." 
+            })
+        else:    
+            res = jsonify({
+                "from": "AI Assistant",
+                "text": api_response.json()["message"]["content"] 
+                }) 
     res.headers.add("Access-Control-Allow-Headers", "Content-Type,Access-Control-Allow-Origin")
     res.headers.add("Content-Type", "application/json")
     res.headers.add("Access-Control-Allow-Origin", config.allowed_origin)

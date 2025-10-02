@@ -33,6 +33,8 @@ const send = async (event) => {
     // Do we want AI Assistant message streamed or in one piece
     const stream = streamCheckbox.checked ? true : false;
 
+    const errorMessageForUser = "Failed to get an answer from AI."
+
     // Send question to backend and wait for answer
     try {
         const response = await fetch(backendUrl, {
@@ -48,7 +50,7 @@ const send = async (event) => {
         })
         if (!response.ok) {
             console.log(response);
-            throw new Error("Failed to get an answer from AI.");
+            throw new Error(errorMessageForUser);
         }
 
         if (!errorElement.classList.contains("hidden")) errorElement.classList.add("hidden");
@@ -56,16 +58,25 @@ const send = async (event) => {
         // Stream reader
         if (stream) {
             const newMessageDiv = createMessageDiv("AI Assistant:", "", messagesDiv);
-            messagesDiv.appendChild(newMessageDiv);
 
             const reader = response.body.getReader();
 
             let index = 0;
             while (true) {
                 const { done, value } = await reader.read();
-                if (done) break;
+
+                if (done) break; // If stream ended, stop waiting for messages
+
                 const message = new TextDecoder().decode(value);
                 if (local) console.log(`Received ${index}:`, message);
+
+                // If handled error sent from backend, stop waiting for messages
+                if (JSON.parse(message).error) {
+                    if (JSON.parse(message).message) setErrorElement(errorElement, JSON.parse(message).message);
+                    else setErrorElement(errorElement, errorMessageForUser);
+                    break;
+                }
+                messagesDiv.appendChild(newMessageDiv);
 
                 // At some point the message (JSON string) seems to include at least two JSON objects -> JSON.parse raises error. As a quick fix let's split these messages.
                 console.log("TRUE OR FALSE:", message.includes("false}{"))
@@ -110,17 +121,19 @@ const send = async (event) => {
                 content: data.text
             });
             if (local) console.log("MESSAGES:", messages);
-            messagesDiv.appendChild(createMessageDiv("AI Assistant:", data.text, messagesDiv));
+            if (data.error) {
+                setErrorElement(errorElement, data.message);
+            } else {
+                messagesDiv.appendChild(createMessageDiv("AI Assistant:", data.text, messagesDiv));
+            }
         }
         applyColorTheme();
         sendButton.removeAttribute("disabled");
 
     } catch (error) {
         if (local) console.log("Error getting answer from AI:", error);
-        errorElement.innerText = "Failed to get an answer from AI.";
-        if (errorElement.classList.contains("hidden")) {
-            errorElement.classList.remove("hidden");
-        }
+        setErrorElement(errorElement, errorMessageForUser);
+        sendButton.removeAttribute("disabled");
     }
 };
 
@@ -175,6 +188,13 @@ const applyColorTheme = () => {
         const isDark =  element.classList.contains("dark");
         if (isDark) element.classList.remove("dark");
         });
+    }
+};
+
+const setErrorElement = (errorElement, message) => {
+    errorElement.innerText = message;
+    if (errorElement.classList.contains("hidden")) {
+        errorElement.classList.remove("hidden");
     }
 };
 
