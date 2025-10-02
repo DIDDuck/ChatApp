@@ -12,6 +12,10 @@ if (messagesDiv.querySelectorAll("div").length === 0 && !messagesDiv.classList.c
 const send = async (event) => {
     event.preventDefault();
 
+    // Disable using send button before we get a reply for current message
+    const sendButton = document.getElementById("send-button");
+    sendButton.setAttribute("disabled", "");
+
     // Get form values
     const userMessageText = document.getElementById("user-message-box").value;
     const streamCheckbox = document.getElementById("stream-checkbox");
@@ -95,7 +99,6 @@ const send = async (event) => {
             if (local) console.log("MESSAGES:", messages);
             newMessageDiv.querySelector("div").innerText = "";
             newMessageDiv.querySelector("div").innerHTML = md.render(completeText);
-            applyColorTheme();
 
         // Read response in one piece
         } else {
@@ -108,8 +111,9 @@ const send = async (event) => {
             });
             if (local) console.log("MESSAGES:", messages);
             messagesDiv.appendChild(createMessageDiv("AI Assistant:", data.text, messagesDiv));
-            applyColorTheme();
-        } 
+        }
+        applyColorTheme();
+        sendButton.removeAttribute("disabled");
 
     } catch (error) {
         if (local) console.log("Error getting answer from AI:", error);
