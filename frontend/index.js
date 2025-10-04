@@ -70,12 +70,6 @@ const send = async (event) => {
                 const message = new TextDecoder().decode(value);
                 if (local) console.log(`Received ${index}:`, message);
 
-                // If handled error sent from backend, stop waiting for messages
-                if (JSON.parse(message).error) {
-                    if (JSON.parse(message).message) setErrorElement(errorElement, JSON.parse(message).message);
-                    else setErrorElement(errorElement, errorMessageForUser);
-                    break;
-                }
                 messagesDiv.appendChild(newMessageDiv);
 
                 // At some point the message (JSON string) seems to include at least two JSON objects -> JSON.parse raises error. As a quick fix let's split these messages.
@@ -98,7 +92,15 @@ const send = async (event) => {
                     }
                     if (local) console.log(`SPLIT ERROR MESSAGE: ${index}`)
                 }
-                else newMessageDiv.querySelector("div").innerText += JSON.parse(message)["response"] ?? JSON.parse(message)["message"]["content"];
+                else {
+                    // If handled error sent from backend, stop waiting for messages
+                    if (JSON.parse(message).error) {
+                        if (JSON.parse(message).message) setErrorElement(errorElement, JSON.parse(message).message);
+                        else setErrorElement(errorElement, errorMessageForUser);
+                        break;
+                    }
+                    newMessageDiv.querySelector("div").innerText += JSON.parse(message)["response"] ?? JSON.parse(message)["message"]["content"];
+                }
                 index++;
             }
             // When text is complete, convert from markdown to html, and add complete reply to messages

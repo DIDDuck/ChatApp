@@ -12,48 +12,19 @@ def answer():
     stream = config.stream # default value, gets overwritten with frontend form value
     messages = None
     content_type = request.headers.get('Content-Type')
+
     if (content_type == 'application/json'):
         user_prompt = request.json["message"]
         stream = request.json["stream"]
         messages = request.json["messages"]
+        message_to_frontend = "Failed to get an answer from AI."
         print("REQUEST:", request.json)
     
-
     print("USER_PROMPT:", user_prompt)
     print("STREAM:", stream)
 
-    
-    # We wait for the response to be complete
-    if stream == False and request.method == "POST":
-        try:
-            if os.getenv("LLM_URL").endswith("generate"):
-                api_response = requests.post(os.getenv("LLM_URL"), json = {
-                    "model": config.model,
-                    "prompt": user_prompt,
-                    "stream": False
-                })
-
-            if os.getenv("LLM_URL").endswith("chat"):
-                api_response = requests.post(os.getenv("LLM_URL"), json = {
-                    "model": config.model,
-                    "messages": messages,
-                    "stream": False
-                })
-        except:
-            print("Something failed")
-            res = jsonify({
-                "error": True,
-                "message": "API response failed."
-            })
-            res.headers.add("Access-Control-Allow-Headers", "Content-Type,Access-Control-Allow-Origin")
-            res.headers.add("Content-Type", "application/json")
-            res.headers.add("Access-Control-Allow-Origin", config.allowed_origin)
-
-            return res
-
-
     # We get a streaming response piece by piece
-    else:
+    if stream == True and request.method == "POST":
         if request.method == "POST":
             def generate_stream():
                 try:
@@ -75,7 +46,7 @@ def answer():
                     print("Something failed")
                     res_dict = {
                         "error": True,
-                        "message": "Failed to get an answer from AI."
+                        "message": message_to_frontend
                     }
                     yield json.dumps(res_dict)
                     return 
@@ -94,6 +65,35 @@ def answer():
                     "Access-Control-Allow-Origin": config.allowed_origin
                 } 
             return Response(stream_with_context(generate_stream()), content_type = "text/plain", headers = headers)
+
+    # We wait for the response to be complete
+    if stream == False and request.method == "POST":
+        try:
+            if os.getenv("LLM_URL").endswith("generate"):
+                api_response = requests.post(os.getenv("LLM_URL"), json = {
+                    "model": config.model,
+                    "prompt": user_prompt,
+                    "stream": False
+                })
+
+            if os.getenv("LLM_URL").endswith("chat"):
+                api_response = requests.post(os.getenv("LLM_URL"), json = {
+                    "model": config.model,
+                    "messages": messages,
+                    "stream": False
+                })
+        except:
+            print("Something failed")
+            res = jsonify({
+                "error": True,
+                "message": message_to_frontend
+            })
+            res.headers.add("Access-Control-Allow-Headers", "Content-Type,Access-Control-Allow-Origin")
+            res.headers.add("Content-Type", "application/json")
+            res.headers.add("Access-Control-Allow-Origin", config.allowed_origin)
+
+            return res
+
         
     if request.method == "OPTIONS": res = jsonify({}) # dummy payload for OPTIONS message reply
 
@@ -101,7 +101,7 @@ def answer():
         if "error" in api_response.json():
             res = jsonify({
                 "error": True,
-                "message": "Failed to get an answer from AI." 
+                "message": message_to_frontend 
             })    
         else:
             res = jsonify({
@@ -113,7 +113,7 @@ def answer():
         if "error" in api_response.json():
             res = jsonify({
                 "error": True,
-                "message": "Failed to get an answer from AI." 
+                "message": message_to_frontend 
             })
         else:    
             res = jsonify({
