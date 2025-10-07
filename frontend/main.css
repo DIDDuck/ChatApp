@@ -62,6 +62,12 @@ body {
     right: 20px;
 }
 
+.absolute-top-left {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
 .user-message-container, .messages-container {
     margin-top: 15px;
     display: flex;
@@ -116,6 +122,17 @@ button {
 
 button:hover {
     background-color: #dae6ff;
+}
+
+.chats-list button {
+    margin-top: 0;
+    min-width: 50px;
+    max-width: 50px;
+    height: 20px;
+}
+
+.chats-list button.left-button {
+    margin-left: auto;
 }
 
 #messages-div {
@@ -176,6 +193,31 @@ button:hover {
     margin-top: 10px;
     color: red;
 }
+
+.chats-list {
+    padding: 10px;
+    z-index: 3;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #f5e9f8;
+}
+.chats-list ul {
+    list-style-type: disc;
+    padding: 15px;
+}
+.chats-list ul>li {
+    margin-bottom: 15px;
+    margin-left: 20px;
+}
+.chats-list ul>li p {
+    font-size: 14px;
+    text-wrap: nowrap;
+    overflow: hidden;
+}
+
 
 .dark {
     background-color: #161616;

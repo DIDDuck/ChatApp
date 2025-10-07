@@ -3,7 +3,11 @@ import { local, backendUrl } from "./configuration.js";
 const errorElement = document.getElementById("error-field");
 const messagesDiv = document.getElementById("messages-div");
 const md = window.markdownit({ html: false });
+const chatsFromLocalStorage = JSON.parse(localStorage.getItem("chats")) ?? [];
+console.log("CHATS FROM LS:", chatsFromLocalStorage)
+
 const messages = []; // We want to save the whole conversation
+const currentChat = { id: new Date().toUTCString(), messages: messages };
 
 if (messagesDiv.querySelectorAll("div").length === 0 && !messagesDiv.classList.contains("hidden")) {
     messagesDiv.classList.add("hidden");
@@ -109,6 +113,7 @@ const send = async (event) => {
                 role: "assistant",
                 content: completeText
             });
+            saveChatToLocalStorage(currentChat, chatsFromLocalStorage);
             if (local) console.log("MESSAGES:", messages);
             newMessageDiv.querySelector("div").innerText = "";
             newMessageDiv.querySelector("div").innerHTML = md.render(completeText);
@@ -122,6 +127,7 @@ const send = async (event) => {
                 role: "assistant",
                 content: data.text
             });
+            saveChatToLocalStorage(currentChat, chatsFromLocalStorage);
             if (local) console.log("MESSAGES:", messages);
             if (data.error) {
                 setErrorElement(errorElement, data.message);
@@ -168,6 +174,8 @@ const changeColorTheme = () => {
     document.getElementById("user-message-box").classList.toggle("dark");
     document.getElementById("messages-div").classList.toggle("dark");
     document.getElementsByClassName("container")[0].classList.toggle("dark");
+    document.getElementsByClassName("chats-list")[0].classList.toggle("dark")
+
     document.querySelectorAll("#messages-div>div").forEach(element => {
         element.classList.toggle("dark")
     });
@@ -200,5 +208,52 @@ const setErrorElement = (errorElement, message) => {
     }
 };
 
+const saveChatToLocalStorage = (chat, chats) => {
+    if (chats.filter(c => c.id === chat.id).length === 0) { // Chat was not loaded from localStorage
+        chats.push(chat);
+    } else {
+        chats.forEach(c => { // Chat was loaded from localStorage, let's update the existing one
+            if (c.id === chat.id) c.messages = chat.messages;
+        });
+    }
+    localStorage.setItem("chats", JSON.stringify(chats));
+};
+
+const toggleMenu = () => {
+    const chatsList = document.getElementsByClassName("chats-list")[0];
+    let content = "";
+    if (chatsList.classList.contains("hidden")) {
+        const ul = document.createElement("ul");
+        chatsFromLocalStorage.toReversed().forEach(chat => {
+            content += `
+            <li>
+                <div class="flex">
+                    <p onClick="loadSavedChat()">${chat.messages[0].content}</p>    
+                    <button class="left-button" onClick="deleteSavedChat()">Delete</button>
+                </div>
+            </li>\n
+            `;
+        })
+        ul.innerHTML = content;
+        chatsList.appendChild(ul);
+    } else {
+        if (chatsList.getElementsByTagName("ul").length >= 1) chatsList.removeChild(chatsList.getElementsByTagName("ul")[0]);
+    }
+    chatsList.classList.toggle("hidden");
+    
+};
+
+const loadSavedChat = () => {
+    console.log("testing load");
+};
+
+const deleteSavedChat = () => {
+    console.log("testing delete");
+};
+
+
 window.send = send;
 window.changeColorTheme = changeColorTheme;
+window.toggleMenu = toggleMenu;
+window.loadSavedChat = loadSavedChat;
+window.deleteSavedChat = deleteSavedChat;
