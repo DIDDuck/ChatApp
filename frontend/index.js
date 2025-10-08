@@ -226,6 +226,38 @@ const saveChatToLocalStorage = (chat, chats) => {
     localStorage.setItem("chats", JSON.stringify(chats));
 };
 
+const confirmChatDelete = (chatId) => {
+    const confirmBgDiv = document.createElement("div");
+    confirmBgDiv.id = "confirm-bg-div";
+
+    const confirmDiv = document.createElement("div");
+    confirmDiv.id = "confirm-delete";
+
+    confirmDiv.innerHTML = `
+        <p>Are you sure you want to delete this chat?</p>
+        <div class="mt-20 flex between">
+            <button onclick="confirmChatDeleteYes('${chatId}')">Yes</button>
+            <button onclick="confirmChatDeleteNo()">No</button>
+        </div>     
+    `
+    const chatsList = document.getElementsByClassName("chats-list")[0];
+    chatsList.appendChild(confirmBgDiv);
+    chatsList.appendChild(confirmDiv);
+};
+
+const confirmChatDeleteNo = () => {
+    const chatsList = document.getElementsByClassName("chats-list")[0];
+    chatsList.removeChild(document.getElementById("confirm-delete"));
+    chatsList.removeChild(document.getElementById("confirm-bg-div"));
+};
+
+const confirmChatDeleteYes = (chatId) => {
+    const chatsList = document.getElementsByClassName("chats-list")[0];
+    chatsList.removeChild(document.getElementById("confirm-delete"));
+    chatsList.removeChild(document.getElementById("confirm-bg-div"));
+    deleteSavedChat(chatId);
+};
+
 const toggleMenu = (direction) => {
     const chatsList = document.getElementsByClassName("chats-list")[0];
     let content = "";
@@ -236,7 +268,7 @@ const toggleMenu = (direction) => {
             <li>
                 <div class="flex">
                     <p data-id="${chat.id}" onClick="loadSavedChat('${chat.id}')">${chat.messages[0].content}</p>    
-                    <button class="left-button" onClick="deleteSavedChat('${chat.id}')">Delete</button>
+                    <button class="left-button" onClick="confirmChatDelete('${chat.id}')">Delete</button>
                 </div>
             </li>\n
             `;
@@ -256,6 +288,7 @@ const toggleMenu = (direction) => {
         }, 1000);
     }
 };
+
 
 const deleteSavedChat = (chatId) => {
     const updatedChatsList = chatsFromLocalStorage.filter(c => c.id !== chatId && "id" in c );
@@ -302,3 +335,6 @@ window.toggleMenu = toggleMenu;
 window.loadSavedChat = loadSavedChat;
 window.deleteSavedChat = deleteSavedChat;
 window.endChat = endChat;
+window.confirmChatDelete = confirmChatDelete;
+window.confirmChatDeleteNo = confirmChatDeleteNo;
+window.confirmChatDeleteYes = confirmChatDeleteYes;

@@ -237,6 +237,31 @@ button:hover {
     cursor: pointer;
 }
 
+#confirm-bg-div {
+    position: absolute;
+    z-index: 4;
+    width: 100%;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    opacity: 0.6;
+    background-color: #3f3e3b
+}
+
+#confirm-delete {
+    padding: 10px;
+    width: 200px;
+    height: 150px;
+    border: 1px solid black;
+    border-radius: 5px;
+    z-index: 5;
+    position: absolute;
+    top: calc(50vh - 75px);
+    left: calc(50% - 100px);
+    color: black;
+    background-color: #ffa500;
+}
+
 .dark {
     background-color: #161616;
     color: rgb(236, 236, 236);
