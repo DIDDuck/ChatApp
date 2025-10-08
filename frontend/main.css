@@ -221,6 +221,9 @@ button:hover {
     text-wrap: nowrap;
     overflow: hidden;
 }
+.chats-list ul>li p:hover {
+    cursor: pointer;
+}
 
 .dark {
     background-color: #161616;

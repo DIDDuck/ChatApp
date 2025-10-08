@@ -235,7 +235,7 @@ const toggleMenu = () => {
             content += `
             <li>
                 <div class="flex">
-                    <p data-id="${chat.id}" onClick="loadSavedChat()">${chat.messages[0].content}</p>    
+                    <p data-id="${chat.id}" onClick="loadSavedChat('${chat.id}')">${chat.messages[0].content}</p>    
                     <button class="left-button" onClick="deleteSavedChat('${chat.id}')">Delete</button>
                 </div>
             </li>\n
@@ -250,12 +250,8 @@ const toggleMenu = () => {
     
 };
 
-const loadSavedChat = () => {
-    console.log("testing load");
-};
-
 const deleteSavedChat = (chatId) => {
-    const updatedChatsList = chatsFromLocalStorage.filter(c => c.id !== chatId);
+    const updatedChatsList = chatsFromLocalStorage.filter(c => c.id !== chatId && "id" in c );
     localStorage.setItem("chats", JSON.stringify(updatedChatsList)); // Update list in localStorage
     chatsFromLocalStorage = loadChatsFromStorage(); // Update local copy of list
     // Remove deleted chat from DOM list
@@ -269,6 +265,30 @@ const endChat = () => {
     currentChat = { id: new Date().toUTCString(), messages: messages };
     messagesDiv.classList.add("hidden");
     document.getElementById("end-chat-button").setAttribute("disabled", "");
+};
+
+const loadSavedChat = (chatId) => {
+    console.log("testing load");
+    // Let's end current chat
+    endChat();
+    // Load current chat from saved chats and set local variables
+    const loadedChat = chatsFromLocalStorage.filter(c => c.id === chatId)[0];
+    console.log("LOADED CHAT:", loadedChat);
+    messages = loadedChat.messages;
+    const id = loadedChat.id;
+    currentChat = { id: id, messages: messages };
+    // Go through all the messages in chat and add them in messagesDiv
+    messages.forEach(message => {
+        if (message.role === "user") {
+            messagesDiv.appendChild(createMessageDiv("User:", message.content, messagesDiv));
+            if (messagesDiv.classList.contains("hidden")) messagesDiv.classList.remove("hidden");    
+        }
+        if (message.role === "assistant") {
+            messagesDiv.appendChild(createMessageDiv("AI Assistant:", message.content, messagesDiv));
+        }
+    })
+    document.getElementById("end-chat-button").removeAttribute("disabled");
+    toggleMenu();
 };
 
 window.send = send;
