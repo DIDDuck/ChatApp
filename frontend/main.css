@@ -90,6 +90,10 @@ body {
     flex-direction: column;
 }
 
+.between {
+    justify-content: space-between;
+}
+
 .checkbox{
     padding-top: 2px;
     width: 15px;
@@ -217,7 +221,6 @@ button:hover {
     text-wrap: nowrap;
     overflow: hidden;
 }
-
 
 .dark {
     background-color: #161616;

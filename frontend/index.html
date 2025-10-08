@@ -42,7 +42,10 @@
                         <label for="stream-checkbox">Streaming response</label>
                         <input id="stream-checkbox" type="checkbox" name="stream" class="checkbox" checked>
                     </div>
-                    <button id="send-button" type="submit">Send</button>
+                    <div class="flex between">
+                        <button id="send-button" type="submit">Send</button>
+                        <button id="end-chat-button" type="button" onclick="endChat()" disabled >End Chat</button>
+                    </div>
                     <p id="error-field" class="hidden"></p>
                 </form>
             </div>

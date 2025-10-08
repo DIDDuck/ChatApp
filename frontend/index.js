@@ -1,13 +1,17 @@
 import { local, backendUrl } from "./configuration.js";
 
+const loadChatsFromStorage = () => {
+    return JSON.parse(localStorage.getItem("chats")) ?? [];    
+};
+
 const errorElement = document.getElementById("error-field");
 const messagesDiv = document.getElementById("messages-div");
 const md = window.markdownit({ html: false });
-const chatsFromLocalStorage = JSON.parse(localStorage.getItem("chats")) ?? [];
-console.log("CHATS FROM LS:", chatsFromLocalStorage)
+let chatsFromLocalStorage = loadChatsFromStorage();
+if (local) console.log("CHATS FROM LS:", chatsFromLocalStorage)
 
-const messages = []; // We want to save the whole conversation
-const currentChat = { id: new Date().toUTCString(), messages: messages };
+let messages = []; // We want to save the whole conversation
+let currentChat = { id: new Date().toUTCString(), messages: messages };
 
 if (messagesDiv.querySelectorAll("div").length === 0 && !messagesDiv.classList.contains("hidden")) {
     messagesDiv.classList.add("hidden");
@@ -19,6 +23,8 @@ const send = async (event) => {
     // Disable using send button before we get a reply for current message
     const sendButton = document.getElementById("send-button");
     sendButton.setAttribute("disabled", "");
+    // Also let's disable end chat button while waiting for answer
+    document.getElementById("end-chat-button").setAttribute("disabled", "");
 
     // Get form values
     const userMessageText = document.getElementById("user-message-box").value;
@@ -53,7 +59,7 @@ const send = async (event) => {
             })
         })
         if (!response.ok) {
-            console.log(response);
+            if (local) console.log(response);
             throw new Error(errorMessageForUser);
         }
 
@@ -77,7 +83,7 @@ const send = async (event) => {
                 messagesDiv.appendChild(newMessageDiv);
 
                 // At some point the message (JSON string) seems to include at least two JSON objects -> JSON.parse raises error. As a quick fix let's split these messages.
-                console.log("TRUE OR FALSE:", message.includes("false}{"))
+                if (local) console.log("TRUE OR FALSE:", message.includes("false}{"))
                 if (message.includes("false}{")) {
                     const partMessages = message.split("false}{"); // could be 2 or more partMessages
                     let currentMessage;
@@ -117,6 +123,7 @@ const send = async (event) => {
             if (local) console.log("MESSAGES:", messages);
             newMessageDiv.querySelector("div").innerText = "";
             newMessageDiv.querySelector("div").innerHTML = md.render(completeText);
+            document.getElementById("end-chat-button").removeAttribute("disabled");
 
         // Read response in one piece
         } else {
@@ -228,8 +235,8 @@ const toggleMenu = () => {
             content += `
             <li>
                 <div class="flex">
-                    <p onClick="loadSavedChat()">${chat.messages[0].content}</p>    
-                    <button class="left-button" onClick="deleteSavedChat()">Delete</button>
+                    <p data-id="${chat.id}" onClick="loadSavedChat()">${chat.messages[0].content}</p>    
+                    <button class="left-button" onClick="deleteSavedChat('${chat.id}')">Delete</button>
                 </div>
             </li>\n
             `;
@@ -247,13 +254,26 @@ const loadSavedChat = () => {
     console.log("testing load");
 };
 
-const deleteSavedChat = () => {
-    console.log("testing delete");
+const deleteSavedChat = (chatId) => {
+    const updatedChatsList = chatsFromLocalStorage.filter(c => c.id !== chatId);
+    localStorage.setItem("chats", JSON.stringify(updatedChatsList)); // Update list in localStorage
+    chatsFromLocalStorage = loadChatsFromStorage(); // Update local copy of list
+    // Remove deleted chat from DOM list
+    const elementToRemove = document.querySelector(`.chats-list ul li:has(div>p[data-id="${chatId}"])`);
+    elementToRemove.parentElement.removeChild(elementToRemove);
 };
 
+const endChat = () => {
+    messages = [];
+    messagesDiv.innerHTML = "";
+    currentChat = { id: new Date().toUTCString(), messages: messages };
+    messagesDiv.classList.add("hidden");
+    document.getElementById("end-chat-button").setAttribute("disabled", "");
+};
 
 window.send = send;
 window.changeColorTheme = changeColorTheme;
 window.toggleMenu = toggleMenu;
 window.loadSavedChat = loadSavedChat;
 window.deleteSavedChat = deleteSavedChat;
+window.endChat = endChat;
