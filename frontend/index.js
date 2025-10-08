@@ -268,12 +268,10 @@ const endChat = () => {
 };
 
 const loadSavedChat = (chatId) => {
-    console.log("testing load");
     // Let's end current chat
     endChat();
     // Load current chat from saved chats and set local variables
     const loadedChat = chatsFromLocalStorage.filter(c => c.id === chatId)[0];
-    console.log("LOADED CHAT:", loadedChat);
     messages = loadedChat.messages;
     const id = loadedChat.id;
     currentChat = { id: id, messages: messages };
