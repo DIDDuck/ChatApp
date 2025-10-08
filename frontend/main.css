@@ -198,14 +198,26 @@ button:hover {
     color: red;
 }
 
+
+@keyframes chatListOpen {
+  0%   {left: -100%;}
+  100% {left: 0;}
+}
+@keyframes chatListClose {
+  0%   {left: 0;}
+  100% {left: -100%;}
+}
 .chats-list {
     padding: 10px;
     z-index: 3;
     position: absolute;
     top: 0;
-    left: 0;
+    left: -100%;
     width: 100%;
     height: 100vh;
+    animation-duration: 0.25s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
     background-color: #f5e9f8;
 }
 .chats-list ul {

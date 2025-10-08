@@ -226,7 +226,7 @@ const saveChatToLocalStorage = (chat, chats) => {
     localStorage.setItem("chats", JSON.stringify(chats));
 };
 
-const toggleMenu = () => {
+const toggleMenu = (direction) => {
     const chatsList = document.getElementsByClassName("chats-list")[0];
     let content = "";
     if (chatsList.classList.contains("hidden")) {
@@ -243,11 +243,18 @@ const toggleMenu = () => {
         })
         ul.innerHTML = content;
         chatsList.appendChild(ul);
-    } else {
-        if (chatsList.getElementsByTagName("ul").length >= 1) chatsList.removeChild(chatsList.getElementsByTagName("ul")[0]);
     }
-    chatsList.classList.toggle("hidden");
-    
+    if (direction === "open") {
+        chatsList.style.animationName = "chatListOpen";
+        chatsList.classList.toggle("hidden");
+    };
+    if (direction === "close") {
+        chatsList.style.animationName = "chatListClose";
+        setTimeout(() => {
+            chatsList.classList.toggle("hidden");
+            if (chatsList.getElementsByTagName("ul").length >= 1) chatsList.removeChild(chatsList.getElementsByTagName("ul")[0]);
+        }, 1000);
+    }
 };
 
 const deleteSavedChat = (chatId) => {
@@ -286,7 +293,7 @@ const loadSavedChat = (chatId) => {
         }
     })
     document.getElementById("end-chat-button").removeAttribute("disabled");
-    toggleMenu();
+    toggleMenu('close');
 };
 
 window.send = send;
