@@ -4,6 +4,7 @@
     --container-bg-color-dark: #362c3f;
     --container-text-color: black;
     --container-max-width: 960px;
+    --link-color: #ffa500;
     --messages-bg-color-dark: #2b2b2b;
     --text-box-max-width: 880px;
     --user-message-border-color-dark: black;
@@ -123,7 +124,11 @@ body {
     padding-top: 2px;
     width: 15px;
     height: 15px;
-} 
+}
+
+a {
+    color: var(--link-color);
+}
 
 #user-message-box {
     max-width: 100%;
@@ -188,6 +193,9 @@ button:hover {
 }
 #messages-div>div>p {
     font-size: 16px;
+}
+#messages-div li:has(a) {
+    overflow-x: auto;
 }
 #messages-div pre:has(code) {
     padding: 5px;
