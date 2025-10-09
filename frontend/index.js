@@ -327,6 +327,7 @@ const loadSavedChat = (chatId) => {
     })
     document.getElementById("end-chat-button").removeAttribute("disabled");
     toggleMenu('close');
+    applyColorTheme();
 };
 
 window.send = send;
