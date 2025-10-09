@@ -1,7 +1,7 @@
 :root {
     --body-bg-color: #ffffff;
     --container-bg-color: #f8deff;
-    --container-bg-color-dark: #251e2b;
+    --container-bg-color-dark: #362c3f;
     --container-text-color: black;
     --container-max-width: 960px;
     --messages-bg-color-dark: #2b2b2b;
@@ -9,16 +9,17 @@
     --user-message-border-color-dark: black;
     --button-border-color: black;
     --button-bg-color: #feffd5;
+    --button-text-color: black;
     --button-hover-bg-color: #dae6ff;
     --messages-div-bg-color: #ffffff;
     --messages-div-border-color: black;
     --messages-div-div-bg-color: #fcf3ff;
     --messages-div-div-bg-color-dark: #222222;
     --messages-div-pre-code-bg-color: #e7e7e7;
-    --messages-div-pre-code-bg-color-dark: #080808;
+    --messages-div-pre-code-bg-color-dark: #161616;
     --messages-div-pre-code-border-color-dark: black;
     --messages-div-code-bg-color: #e7e7e7;
-    --messages-div-code-bg-color-dark: #080808;
+    --messages-div-code-bg-color-dark: #161616;
     --error-field-text-color: red;
     --chats-list-bg-color: #f5e9f8;
     --confirm-bg-div-bg-color: #3f3e3b;
@@ -130,7 +131,7 @@ body {
     margin-bottom: 5px;
     padding: 3px 5px;
     border-radius: 5px;
-    font-size: 14px;
+    font-size: 16px;
 }
 #user-message-box.dark {
     background-color: var(--messages-bg-color-dark);
@@ -146,6 +147,7 @@ button {
     font-weight: 500;
     text-transform: uppercase;
     background-color: var(--button-bg-color);
+    color: var(--button-text-color);
 }
 
 button:hover {
