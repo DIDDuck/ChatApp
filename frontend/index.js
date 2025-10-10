@@ -144,11 +144,13 @@ const send = async (event) => {
         }
         applyColorTheme();
         sendButton.removeAttribute("disabled");
+        document.getElementById("end-chat-button").removeAttribute("disabled");
 
     } catch (error) {
         if (local) console.log("Error getting answer from AI:", error);
         setErrorElement(errorElement, errorMessageForUser);
         sendButton.removeAttribute("disabled");
+        document.getElementById("end-chat-button").removeAttribute("disabled");
     }
 };
 

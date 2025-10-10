@@ -11,6 +11,7 @@
     --button-border-color: black;
     --button-bg-color: #feffd5;
     --button-text-color: black;
+    --button-disabled-text-color: #a5a5a5;
     --button-hover-bg-color: #dae6ff;
     --messages-div-bg-color: #ffffff;
     --messages-div-border-color: black;
@@ -153,6 +154,10 @@ button {
     text-transform: uppercase;
     background-color: var(--button-bg-color);
     color: var(--button-text-color);
+}
+
+button:disabled {
+    color: var(--button-disabled-text-color);
 }
 
 button:hover {
