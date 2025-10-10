@@ -6,7 +6,7 @@ if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
 local = True
-production = ""
+production = os.getenv("PRODUCTION_FRONTEND")
 
 allowed_origin = "http://127.0.0.1:3000" if local else production
 
