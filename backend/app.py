@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 
 
-@app.route("/api/chat", methods = ["POST", "OPTIONS"])
+@app.route("/chat", methods = ["POST", "OPTIONS"])
 def answer():
 
     user_prompt = ""
